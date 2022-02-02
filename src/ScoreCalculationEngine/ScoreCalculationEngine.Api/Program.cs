@@ -5,6 +5,7 @@ using ScoreCalculationEngine.Api.Utils;
 using ScoreCalculationEngine.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+var isApiKeyAuthEnabled = false;
 
 // Add services to the container.
 builder.Services.AddApplication();
@@ -17,12 +18,15 @@ builder.Services.AddControllers()
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddCustomSwagger();
+builder.Services.AddCustomSwagger(enableApiKeyAuth: isApiKeyAuthEnabled);
 builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
 var app = builder.Build();
 
-app.AddAuthenticationAdapter();
+if (isApiKeyAuthEnabled)
+{
+    app.AddAuthenticationAdapter();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

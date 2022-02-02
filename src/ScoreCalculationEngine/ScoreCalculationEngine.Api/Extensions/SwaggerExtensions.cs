@@ -5,7 +5,7 @@ namespace ScoreCalculationEngine.Api.Extensions
 {
     public static class SwaggerExtensions
     {
-        public static void AddCustomSwagger(this IServiceCollection services)
+        public static void AddCustomSwagger(this IServiceCollection services, bool enableApiKeyAuth)
         {
             services.AddSwaggerGen(options =>
             {
@@ -22,24 +22,27 @@ namespace ScoreCalculationEngine.Api.Extensions
                     }
                 });
 
-                options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                if (enableApiKeyAuth)
                 {
-                    Type = SecuritySchemeType.ApiKey,
-                    In = ParameterLocation.Header,
-                    Name = "ApiKey",
-                    Description = "API access key token"
-                });
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+                    options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
                     {
-                        new OpenApiSecurityScheme
+                        Type = SecuritySchemeType.ApiKey,
+                        In = ParameterLocation.Header,
+                        Name = "ApiKey",
+                        Description = "API access key token"
+                    });
+
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
                         {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
-                        },
-                        new string[] { }
-                    }
-                });
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
+                            },
+                            new string[] { }
+                        }
+                    });
+                }
 
                 var filePath = Path.Combine(AppContext.BaseDirectory, "ScoreCalculationEngineApi.xml");
                 options.IncludeXmlComments(filePath);
